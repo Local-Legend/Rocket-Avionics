@@ -1,0 +1,40 @@
+[Unit]
+Description=Rocket TX Telemetry on Raspberry Pi Zero 2 W (sensors + camera + LoRa transmit)
+# Start once local filesystems are mounted. Do NOT use After=multi-user.target
+# here: combined with WantedBy=multi-user.target below it creates a systemd
+# ordering cycle (the service would wait for the target that wants it).
+After=local-fs.target
+
+[Service]
+Type=simple
+User=pi
+
+# Absolute path to the TX script on the Pi Zero 2 W. Adjust if you deploy elsewhere.
+# WorkingDirectory matters: pyLoraRFM9x (lgpio) writes .lgd-nfy* files into the CWD.
+WorkingDirectory=/home/pi/Desktop/Avionics for Rocket/System Scripts
+# Must be the venv interpreter: pynmea2, pyserial, smbus2, bmp280 and pyLoraRFM9x
+# are installed in /home/pi/libs-venv, and the system python3 cannot import
+# them (PEP 668). The venv sees apt's picamera2 via include-system-site-packages.
+ExecStart=/home/pi/libs-venv/bin/python3 "/home/pi/Desktop/Avionics for Rocket/System Scripts/TX_Telemetry.py"
+
+# Unbuffered stdout so journalctl shows lines as they happen.
+Environment=PYTHONUNBUFFERED=1
+# Flight window in seconds; TX_Telemetry.py exits cleanly when it ends (default 8 min).
+Environment=TX_FLIGHT_DURATION_S=480
+
+# Give I2C / serial / SPI / camera a moment to settle after boot.
+ExecStartPre=/bin/sleep 10
+
+# The flight script exits cleanly after TX_FLIGHT_DURATION_S, so "on-failure"
+# would never relaunch it and a pad wait longer than 8 minutes would end
+# telemetry before launch. "always" relaunches it: ~15 s gap (RestartSec +
+# ExecStartPre), and the BMP280 pad baseline is re-zeroed on each start.
+Restart=always
+RestartSec=5
+
+# Send stdout/stderr to the journal so you can debug with: journalctl -u rocket-tx
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

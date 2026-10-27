@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Rocket TX Telemetry
+Comment=Manually start rocket sensors, local camera recording, and LoRa telemetry
+Exec=lxterminal --title="Rocket TX Telemetry" -e "/home/pi/Desktop/Avionics for Rocket/System Scripts/start_tx.sh"
+Path=/home/pi/Desktop/Avionics for Rocket/System Scripts
+Icon=utilities-terminal
+Terminal=false
+Categories=Utility;
+StartupNotify=true

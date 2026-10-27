@@ -1,0 +1,12 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Rocket RX Telemetry
+Comment=Receive and display live rocket telemetry
+# Opens a terminal running the receiver so the live dashboard is visible.
+# lxterminal ships with Raspberry Pi OS desktop. Swap for x-terminal-emulator
+# or xterm if you use a different desktop.
+Exec=lxterminal --title="Rocket RX Telemetry" -e "/home/pi/Desktop/Avionics for Rocket/System Scripts/start_rx.sh"
+Icon=utilities-terminal
+Terminal=false
+Categories=Utility;

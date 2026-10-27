@@ -1,0 +1,7 @@
+{
+  "task_id": "task-flight-timeline",
+  "task_description": "Add the GPS-lock-driven flight timeline to the rocket avionics System Scripts: TX phase state machine PAD -> COUNTDOWN (T-30) -> FLIGHT (T+) -> RECOVERY (GPS-only 1 Hz until power off), a T clock transmitted in every packet (16-field packet), both RX decoder copies + DB migration + displays (terminal, scroll, Tkinter GUI, playback) showing phase and T clock, rocket-tx.service Restart=on-failure, README and steering updates. Spec: .kiro/steering/avionics-project.md section 'Flight timeline requirement'. Plan: .agents/tasks/flight-timeline-plan.md.",
+  "status": "pending",
+  "feature_order": ["FEAT-001", "FEAT-002", "FEAT-003"],
+  "blocked_reason": null
+}

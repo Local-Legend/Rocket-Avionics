@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Name=Rocket TX Graphs
+Comment=Plot the newest TX-local telemetry recording
+Exec=lxterminal --title="Rocket TX Graphs" -e "/home/pi/Desktop/Avionics for Rocket/System Scripts/graph_latest_tx.sh"
+Path=/home/pi/Desktop/Avionics for Rocket/System Scripts
+Icon=utilities-system-monitor
+Terminal=false
+Categories=Utility;
+StartupNotify=true

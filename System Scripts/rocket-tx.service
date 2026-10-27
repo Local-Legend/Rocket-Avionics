@@ -1,0 +1,47 @@
+[Unit]
+Description=Rocket TX Telemetry on Raspberry Pi Zero 2 W (sensors + camera + LoRa transmit)
+# Start once local filesystems are mounted. Do NOT use After=multi-user.target
+# here: combined with WantedBy=multi-user.target below it creates a systemd
+# ordering cycle (the service would wait for the target that wants it).
+After=local-fs.target
+
+[Service]
+Type=simple
+User=pi
+
+# Absolute path to the TX script on the Pi Zero 2 W. Adjust if you deploy elsewhere.
+# WorkingDirectory matters: pyLoraRFM9x (lgpio) writes .lgd-nfy* files into the CWD.
+WorkingDirectory=/home/pi/Desktop/Avionics for Rocket/System Scripts
+# Must be the venv interpreter: pynmea2, pyserial, smbus2, bmp280 and pyLoraRFM9x
+# are installed in /home/pi/libs-venv, and the system python3 cannot import
+# them (PEP 668). The venv sees apt's picamera2 via include-system-site-packages.
+ExecStart=/home/pi/libs-venv/bin/python3 "/home/pi/Desktop/Avionics for Rocket/System Scripts/TX_Telemetry.py"
+
+# Unbuffered stdout so journalctl shows lines as they happen.
+Environment=PYTHONUNBUFFERED=1
+# Avionics window in seconds, measured from T-0 (T-0 is 30 s after GPS lock).
+# After it the script stops the IMU/mag/baro reads and keeps sending GPS-only
+# packets at 1 Hz until power is removed (default 8 min). The local camera has
+# already stopped and finalized at T+3 minutes.
+Environment=TX_FLIGHT_DURATION_S=480
+# Local H.264 video stops and finalises three minutes after T-0. The video is
+# stored only on the TX; no image/video data is transmitted over LoRa.
+Environment=TX_CAMERA_STOP_TPLUS_S=180
+
+# Give I2C / serial / SPI / camera a moment to settle after boot.
+ExecStartPre=/bin/sleep 10
+
+# TX_Telemetry.py runs until power is removed and never exits on its own
+# (PAD -> COUNTDOWN -> FLIGHT -> RECOVERY, then GPS-only forever), so
+# "on-failure" only relaunches it after a crash or a power glitch, about 15 s
+# later (RestartSec + ExecStartPre). A clean exit happens only via
+# `systemctl stop`, which must NOT trigger a restart.
+Restart=on-failure
+RestartSec=5
+
+# Send stdout/stderr to the journal so you can debug with: journalctl -u rocket-tx
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,73 @@
+ROCKET TX — AUTOSTART AND MAINTENANCE COMMANDS
+================================================
+
+These commands are for the Raspberry Pi Zero 2 W (TX).
+The graphical desktop can still load while rocket-tx.service is enabled.
+Run these commands in a terminal on the TX Pi or over SSH.
+
+CHECK CURRENT STATUS
+--------------------
+systemctl is-active rocket-tx.service
+systemctl is-enabled rocket-tx.service
+systemctl status rocket-tx.service
+
+VIEW LIVE TX LOGS
+-----------------
+journalctl -u rocket-tx.service -f
+
+STOP TX NOW, BUT ALLOW IT TO START NEXT BOOT
+--------------------------------------------
+sudo systemctl stop rocket-tx.service
+
+STOP TX NOW AND DISABLE IT ON FUTURE BOOTS
+------------------------------------------
+sudo systemctl disable --now rocket-tx.service
+
+Use this before rebooting into the desktop for maintenance without running TX:
+
+sudo systemctl disable --now rocket-tx.service
+sudo reboot
+
+ENABLE TX FOR FUTURE BOOTS
+--------------------------
+sudo systemctl enable rocket-tx.service
+
+ENABLE TX AND START IT NOW
+--------------------------
+sudo systemctl enable rocket-tx.service
+sudo systemctl start rocket-tx.service
+
+RESTART TX AFTER EDITING THE SCRIPT
+-----------------------------------
+sudo systemctl restart rocket-tx.service
+
+REINSTALL/REFRESH THE SERVICE AFTER EDITING ITS UNIT FILE
+----------------------------------------------------------
+The service is installed and enabled. If `rocket-tx.service` is edited later:
+
+cd "/home/pi/Desktop/Avionics for Rocket/System Scripts"
+chmod +x install_tx_autostart.sh
+sudo ./install_tx_autostart.sh
+
+Then confirm:
+
+systemctl is-enabled rocket-tx.service
+systemctl status rocket-tx.service
+
+MANUAL TESTING WITHOUT AUTOSTART
+--------------------------------
+Use the "Rocket TX Telemetry" desktop icon, or:
+
+cd "/home/pi/Desktop/Avionics for Rocket/System Scripts"
+./start_tx.sh
+
+Press Ctrl+C to stop cleanly and finalize any active local video.
+
+IMPORTANT
+---------
+- Always attach the RFM9x antenna before starting TX.
+- Keep the payload stationary and vertical during the first second while the
+  gyro zero calibration runs.
+- The DISABLE_ROCKET_TX maintenance-inhibit file discussed during development
+  has NOT been wired into rocket-tx.service yet. Creating that file currently
+  has no effect. Use `systemctl disable --now` until that feature is implemented.

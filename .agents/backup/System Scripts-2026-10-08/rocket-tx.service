@@ -1,0 +1,28 @@
+[Unit]
+Description=Rocket TX Telemetry (sensors + camera + LoRa transmit)
+# Wait until the network/boot targets and hardware buses are up before start.
+After=multi-user.target
+Wants=multi-user.target
+
+[Service]
+Type=simple
+User=pi
+
+# Absolute path to the TX script on the Pi Zero. Adjust if you deploy elsewhere.
+WorkingDirectory=/home/pi/Desktop/Avionics for Rocket/System Scripts
+ExecStart=/usr/bin/python3 "/home/pi/Desktop/Avionics for Rocket/System Scripts/TX_Telemetry.py"
+
+# Give I2C / serial / SPI / camera a moment to settle after boot.
+ExecStartPre=/bin/sleep 10
+
+# If the flight script exits (it finishes after its loop), do not hammer-restart.
+# Set to "always" instead if you want it to keep relaunching.
+Restart=on-failure
+RestartSec=5
+
+# Send stdout/stderr to the journal so you can debug with: journalctl -u rocket-tx
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
